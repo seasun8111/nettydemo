@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 文件输出格式 -->
+    <!--
+        %p:输出优先级，即DEBUG,INFO,WARN,ERROR,FATAL
+        %r:输出自应用启动到输出该日志讯息所耗费的毫秒数
+        %t:输出产生该日志事件的线程名
+        %f:输出日志讯息所属的类别的类别名
+        %c:输出日志讯息所属的类的全名
+        %d:输出日志时间点的日期或时间，指定格式的方式： %d{yyyy-MM-dd HH:mm:ss}
+        %l:输出日志事件的发生位置，即输出日志讯息的语句在他所在类别的第几行。
+        %m:输出代码中指定的讯息，如log(message)中的message
+        %n:输出一个换行符号
+    -->
+    <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度 %msg：日志消息，%n是换行符-->
+    <property name="PATTERN" value="%d{yyyyMMdd:HH:mm:ss.SSS} [%thread] %-5level  %msg%n"/>
+    <property name="PURE_MSG" value="%msg%n"/>
+    <!-- test文件路径 -->
+
+    <springProperty scope="context" name="profileactive" source="spring.profiles.active" defaultValue="sit"/>
+    <property name="SERVICE_NAME" value="nettydemo"/>
+    <property name="SERVICE_LOG_PATH" value="/service/logs/${SERVICE_NAME}"/>
+
+    <!--
+    Appender: 设置日志信息的去向,常用的有以下几个
+        ch.qos.logback.core.ConsoleAppender (控制台)
+        ch.qos.logback.core.rolling.RollingFileAppender (文件大小到达指定尺寸的时候产生一个新文件)
+        ch.qos.logback.core.FileAppender (文件)
+    -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <!--   <appender name="TEST-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+           &lt;!&ndash; 文件路径 &ndash;&gt;
+           <file>rmconcact</file>
+           <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+               &lt;!&ndash; 文件名称 &ndash;&gt;
+               <fileNamePattern>%d{yyyy-MM-dd}.log</fileNamePattern>
+               &lt;!&ndash; 文件最大保存历史数量 &ndash;&gt;
+               <MaxHistory>10</MaxHistory>
+           </rollingPolicy>
+
+           <layout class="ch.qos.logback.classic.PatternLayout">
+               <pattern>${PATTERN}</pattern>
+           </layout>
+       </appender>
+       -->
+
+
+    <appender name="common_file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 文件路径 -->
+        <file>${SERVICE_LOG_PATH}/${SERVICE_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 必要节点，包含文件名及"%d"转换符，"%d"可以包含一个java.text.SimpleDateFormat指定的时间格式，默认格式是 yyyy-MM-dd -->
+            <fileNamePattern>${SERVICE_LOG_PATH}/${SERVICE_NAME}_%d{yyyy-MM-dd}.log.%i.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 文件最大保存历史数量 -->
+            <MaxHistory>10</MaxHistory>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${PATTERN}</pattern>
+        </layout>
+    </appender>
+
+
+
+    <springProfile name="dev">
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="common_file"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="sit,prod">
+        <root level="info">
+            <appender-ref ref="common_file"/>
+        </root>
+    </springProfile>
+
+
+</configuration>

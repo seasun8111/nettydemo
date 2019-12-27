@@ -1,0 +1,45 @@
+spring:
+  profiles:
+    active: @env@
+  application:
+    name: nettydemo
+  redis:
+    jedis:
+      pool:
+        max-active: 12
+        min-idle: 0
+        max-idle: 12
+        max-wait: -1
+---
+#SIT环境配置
+spring:
+  profiles: sit
+  redis:
+    database: 110
+    host: r-uf6nqwi0ns0k2ivuam.redis.rds.aliyuncs.com
+    port: 6379
+    password:
+    timeout: 1000
+  datasource:
+    url: jdbc:mysql://rds-vastsky-sit.mysql.rds.aliyuncs.com:3306/frlm?useUnicode=true&characterEncoding=utf-8
+    username: beichen_rw
+    password: 2JqiJ7ZGxxIv
+    driver-class-name: com.mysql.cj.jdbc.Driver
+netty:
+  url: 127.0.0.1
+  port: 7001
+---
+#PROD环境配置
+spring:
+  profiles: prod
+  redis:
+    database: 110
+    host: localhost
+    port: 6379
+    password:
+    timeout: 1000
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/frlm?useUnicode=true&characterEncoding=utf-8
+    username: root
+    password: 5tgb^YHN!@#$
+    driver-class-name: com.mysql.cj.jdbc.Driver
